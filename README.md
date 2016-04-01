@@ -12,5 +12,8 @@ This ruby script can take an image and create a hexadecimal representation of it
 
 ## Usage
 ```
-ruby convert_to_hex.rb <PATH_TO_INPUT_IMAGE> <PATH_TO_WRITE_PUT_IMAGE> <SCALE (0..1)>
+ruby convert_to_hex.rb <PATH_TO_INPUT_IMAGE> <PATH_TO_WRITE_PUT_IMAGE> <SCALE (0.0..1.0)>
 ```
+
+## Notes
+- The images get very large, very fast. Recommended scale is 0.2
