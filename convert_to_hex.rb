@@ -59,7 +59,7 @@ def generate_hex_pixel(pixel_color)
   end
 
   draw.draw(canvas)
-  canvas.rotate!(270).flip.scale($scale)
+  canvas.scale($scale)
 end
 
 # Manipulates the progress bar so we have an idea of where we are in the
@@ -83,7 +83,7 @@ def main()
 
   for i in 0..img.rows
     for j in 0..img.columns
-      pixel = generate_hex_pixel(rgb_to_hex(img.pixel_color(i,j)))
+      pixel = generate_hex_pixel(rgb_to_hex(img.pixel_color(j,i)))
       convert << pixel
       page.x     = j * pixel.columns
       page.y     = i * pixel.rows
@@ -93,7 +93,7 @@ def main()
   end
 
   puts 'Writing image, this could take a while...'
-  convert.mosaic.rotate!(90).flop.write($output)
+  convert.mosaic.write($output)
 end
 
 main()
