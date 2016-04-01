@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'RMagick'
 include Magick
 require 'ruby-progressbar'
