@@ -16,4 +16,4 @@ ruby convert_to_hex.rb <PATH_TO_INPUT_IMAGE> <PATH_TO_WRITE_PUT_IMAGE> <SCALE (0
 ```
 
 ## Notes
-- The images get very large, very fast. Recommended scale is 0.2
+- The images get very large, very fast. Recommended scale is 0.2 
