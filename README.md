@@ -83,8 +83,11 @@ just build-local input.png output.svg
 
 ## Releases
 
-Every push to `master` produces a calver-tagged release (e.g.
-`v2026.05.31`). The container image is published to
-`ghcr.io/llacoste/convert-to-hex:<tag>` and `:latest`. See
+Versioned per [semver](https://semver.org/); `@version` in
+[`mix.exs`](mix.exs) is the source of truth. To cut a release, bump that
+constant and merge to `master` — the Deploy stage reads it, publishes
+`ghcr.io/llacoste/convert-to-hex:v<version>` (plus `:latest`), and cuts
+a matching GitHub Release. Merges without a version bump no-op the
+publish steps. See
 [Releases](https://github.com/llacoste/convert_to_hex/releases) for the
 list.
