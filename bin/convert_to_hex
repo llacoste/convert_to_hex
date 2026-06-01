@@ -1,0 +1,11 @@
+#!/bin/sh
+# Container entrypoint. Runs the Elixir CLI module against the user's argv
+# while keeping the working directory pointed at the user's mounted volume so
+# relative paths resolve as they expect.
+set -e
+
+USER_PWD="${PWD}"
+cd /app
+exec mix run --no-deps-check --no-compile \
+  -e "File.cd!(\"${USER_PWD}\"); ConvertToHex.CLI.main(System.argv())" \
+  -- "$@"
