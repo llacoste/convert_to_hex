@@ -63,9 +63,11 @@ just convert input.png output.svg --tile-size 110
 6. Stream the result to disk as it's generated. Memory stays bounded
    regardless of source image size.
 
-The Anonymous TTF font is embedded as a base64 `@font-face` in the SVG's
-`<defs>`, so the output renders identically in browsers, vector editors,
-and rasterizers without needing the font installed.
+JetBrains Mono Bold (subset to `#0-9A-F`, the only glyphs we render) is
+embedded as a base64 `@font-face` in the SVG's `<defs>`, so the output
+renders identically in browsers, vector editors, and rasterizers without
+needing the font installed. License: SIL Open Font License 1.1
+([priv/LICENSE-JetBrainsMono.txt](priv/LICENSE-JetBrainsMono.txt)).
 
 ## Development
 

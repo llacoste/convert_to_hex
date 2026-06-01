@@ -1,7 +1,11 @@
 defmodule ConvertToHex.SVG do
   @moduledoc false
 
-  @font_path Path.expand("../../priv/Anonymous.ttf", __DIR__)
+  # JetBrains Mono Bold, subset to the 17 glyphs we actually render
+  # (`#` and `0-9 A-F`). Full bold weight is ~278 KB; subset is ~18 KB.
+  # Distributed under the SIL Open Font License 1.1 — see
+  # priv/LICENSE-JetBrainsMono.txt.
+  @font_path Path.expand("../../priv/JetBrainsMono-Bold.subset.ttf", __DIR__)
   @external_resource @font_path
   @font_base64 @font_path |> File.read!() |> Base.encode64()
 
@@ -23,8 +27,9 @@ defmodule ConvertToHex.SVG do
   }
 
   @doc """
-  Opening `<svg>` tag plus a `<defs>` block embedding the bundled Anonymous TTF
-  so the output renders identically regardless of where it's opened.
+  Opening `<svg>` tag plus a `<defs>` block embedding the bundled JetBrains
+  Mono Bold (subset) so the output renders identically regardless of where
+  it's opened.
   """
   def header(grid_width, grid_height, tile_size) do
     width = grid_width * tile_size
@@ -36,11 +41,11 @@ defmodule ConvertToHex.SVG do
     <defs>
     <style><![CDATA[
     @font-face {
-      font-family: 'AnonymousEmbedded';
+      font-family: 'EmbeddedHexFont';
       src: url('data:font/ttf;base64,#{@font_base64}') format('truetype');
       font-weight: bold;
     }
-    text { font-family: 'AnonymousEmbedded', monospace; font-weight: bold; }
+    text { font-family: 'EmbeddedHexFont', monospace; font-weight: bold; }
     ]]></style>
     </defs>
     """

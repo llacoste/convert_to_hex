@@ -23,7 +23,7 @@ defmodule ConvertToHex.SVGTest do
     test "embeds the font as base64" do
       svg = SVG.header(1, 1, 10)
       assert svg =~ "data:font/ttf;base64,"
-      assert svg =~ "font-family: 'AnonymousEmbedded'"
+      assert svg =~ "font-family: 'EmbeddedHexFont'"
     end
   end
 
