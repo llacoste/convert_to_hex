@@ -3,8 +3,9 @@ defmodule ConvertToHex do
   Render an image as a mosaic where every source pixel becomes a tile
   displaying that pixel's `#RRGGBB` code in its own color.
 
-  Output is SVG, written incrementally to disk so memory stays bounded
-  regardless of source image size.
+  Output is SVG, written incrementally to disk row-by-row. Memory is
+  bounded by the number of *unique colors* in the source (each rendered
+  tile is cached and reused), not by the source image's dimensions.
   """
 
   alias ConvertToHex.{Pixels, SVG}
@@ -34,34 +35,35 @@ defmodule ConvertToHex do
 
   defp stream_svg(file, rows, width, height, tile_size) do
     IO.write(file, SVG.header(width, height, tile_size))
-    result = Enum.reduce(rows, {0, %{}}, &write_row(&1, &2, file, tile_size))
+
+    result =
+      rows
+      |> Stream.with_index()
+      |> Enum.reduce({0, %{}}, &write_row(&1, &2, file, tile_size))
+
     IO.write(file, SVG.footer())
     result
   end
 
-  defp write_row({y, pixels}, acc, file, tile_size) do
+  defp write_row({pixels, y}, acc, file, tile_size) do
     pixels
-    |> Enum.with_index()
+    |> Stream.with_index()
     |> Enum.reduce(acc, fn {pixel, x}, {count, cache} ->
-      hex = SVG.rgb_to_hex(pixel)
-      {fragment, cache, count} = fetch_fragment(cache, hex, x, y, tile_size, count)
-      IO.write(file, fragment)
+      {inner, cache, count} = lookup_or_render(cache, SVG.rgb_to_hex(pixel), tile_size, count)
+      IO.write(file, SVG.wrap(inner, x, y, tile_size))
       {count, cache}
     end)
   end
 
-  defp fetch_fragment(cache, hex, x, y, tile_size, count) do
+  defp lookup_or_render(cache, hex, tile_size, count) do
     case Map.fetch(cache, hex) do
-      {:ok, template} ->
-        {place(template, x, y, tile_size), cache, count}
-
-      :error ->
-        template = SVG.cell(hex, 0, 0, tile_size)
-        {place(template, x, y, tile_size), Map.put(cache, hex, template), count + 1}
+      {:ok, inner} -> {inner, cache, count}
+      :error -> render_and_cache(cache, hex, tile_size, count)
     end
   end
 
-  defp place(template, x, y, tile_size) do
-    String.replace(template, "translate(0,0)", "translate(#{x * tile_size},#{y * tile_size})")
+  defp render_and_cache(cache, hex, tile_size, count) do
+    inner = SVG.cell_inner(hex, tile_size)
+    {inner, Map.put(cache, hex, inner), count + 1}
   end
 end
