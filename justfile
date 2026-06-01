@@ -42,11 +42,3 @@ clean:
 # Remove all generated artifacts including build dirs.
 clean-all: clean
     rm -rf _build deps
-
-# Run the conversion without Docker (requires local Elixir + libvips install).
-build-local *args:
-    mix run -e 'ConvertToHex.CLI.main(System.argv())' -- {{args}}
-
-# Run tests without Docker.
-test-local:
-    mix test
