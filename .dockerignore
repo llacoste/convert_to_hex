@@ -1,0 +1,9 @@
+_build
+deps
+cover
+.git
+.github
+tmp
+images/*.svg
+images/*-preview.png
+images/*-preview.jpg

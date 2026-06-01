@@ -1,3 +1,14 @@
-images/awesome.gif
-images/awesome2.gif
-images/awesome3.gif
+/_build/
+/cover/
+/deps/
+/doc/
+/.fetch
+erl_crash.dump
+*.ez
+/tmp/
+/.elixir_ls/
+
+# Generated SVGs during local runs (keep committed samples in images/)
+*.svg
+!images/*.svg
+!test/fixtures/*.svg
