@@ -27,24 +27,27 @@ defmodule ConvertToHex do
     File.mkdir_p!(Path.dirname(output_path))
 
     {unique_count, _cache} =
-      File.open!(output_path, [:write, :utf8], fn file ->
-        IO.write(file, SVG.header(width, height, tile_size))
-
-        result =
-          Enum.reduce(rows, {0, %{}}, fn {y, pixels}, {count, cache} ->
-            Enum.reduce(Enum.with_index(pixels), {count, cache}, fn {pixel, x}, {c, cc} ->
-              hex = SVG.rgb_to_hex(pixel)
-              {fragment, cc2, c2} = fetch_fragment(cc, hex, x, y, tile_size, c)
-              IO.write(file, fragment)
-              {c2, cc2}
-            end)
-          end)
-
-        IO.write(file, SVG.footer())
-        result
-      end)
+      File.open!(output_path, [:write, :utf8], &stream_svg(&1, rows, width, height, tile_size))
 
     {:ok, %{width: width, height: height, unique_colors: unique_count}}
+  end
+
+  defp stream_svg(file, rows, width, height, tile_size) do
+    IO.write(file, SVG.header(width, height, tile_size))
+    result = Enum.reduce(rows, {0, %{}}, &write_row(&1, &2, file, tile_size))
+    IO.write(file, SVG.footer())
+    result
+  end
+
+  defp write_row({y, pixels}, acc, file, tile_size) do
+    pixels
+    |> Enum.with_index()
+    |> Enum.reduce(acc, fn {pixel, x}, {count, cache} ->
+      hex = SVG.rgb_to_hex(pixel)
+      {fragment, cache, count} = fetch_fragment(cache, hex, x, y, tile_size, count)
+      IO.write(file, fragment)
+      {count, cache}
+    end)
   end
 
   defp fetch_fragment(cache, hex, x, y, tile_size, count) do

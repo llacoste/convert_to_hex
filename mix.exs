@@ -20,7 +20,8 @@ defmodule ConvertToHex.MixProject do
 
   defp deps do
     [
-      {:image, "~> 0.54"}
+      {:image, "~> 0.54"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 end
