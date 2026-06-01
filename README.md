@@ -45,8 +45,6 @@ just shell                      # interactive shell in the container
 
 `just run` instead of `just convert` uses the published image from GHCR — skips the local build for when you just want to use the tool.
 
-## Releases
-
-Versioned per [semver](https://semver.org/). `@version` in [`mix.exs`](mix.exs) is the source of truth: bump it and merge to `master`. The Deploy stage publishes `ghcr.io/llacoste/convert-to-hex:v<version>` (plus `:latest`) and cuts a matching GitHub Release. Merges without a version bump no-op the publish. See [Releases](https://github.com/llacoste/convert_to_hex/releases) for the list.
+---
 
 MIT licensed ([`LICENSE`](LICENSE)).
