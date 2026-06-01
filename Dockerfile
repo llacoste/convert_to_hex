@@ -8,7 +8,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # libvips42 is the runtime dep for the `vix` NIF (image I/O + pixel access).
 # build-essential + git let mix compile any deps that need a C toolchain.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# apt-get upgrade pulls fresh security patches that landed in Debian after
+# the base image was published — keeps the image current without waiting
+# for the base tag to roll.
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
       ca-certificates \
       libvips42 \
       build-essential \
