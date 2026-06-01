@@ -27,15 +27,36 @@ env:
 
 jobs:
   # ─────────────────────────── Stage 1: Verify ───────────────────────────
-  # Runs on every push and PR. Cheap, no Docker — uses the toolchain
-  # directly so feedback lands fast.
+  # Runs on every push and PR. Fanned out into three named phases via a
+  # matrix so they appear as child nodes under Verify in the Actions graph
+  # view and run in parallel:
+  #
+  #   Lint    → mix format --check-formatted
+  #   Syntax  → mix compile --warnings-as-errors
+  #   Unit    → mix test
+  #
+  # Build/Deploy `needs: verify` waits for every phase to pass.
   verify:
-    name: Verify
+    name: Verify · ${{ matrix.phase }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - phase: Lint
+            command: mix format --check-formatted
+            needs_libvips: false
+          - phase: Syntax
+            command: mix compile --warnings-as-errors
+            needs_libvips: false
+          - phase: Unit
+            command: mix test --color
+            needs_libvips: true
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install libvips (runtime dep for the vix NIF)
+      - name: Install libvips (Unit only — vix NIF needs it at runtime)
+        if: matrix.needs_libvips
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libvips42
@@ -58,14 +79,8 @@ jobs:
       - name: Fetch deps
         run: mix deps.get
 
-      - name: Check formatting
-        run: mix format --check-formatted
-
-      - name: Compile (warnings as errors)
-        run: mix compile --warnings-as-errors
-
-      - name: Run tests
-        run: mix test --color
+      - name: ${{ matrix.phase }}
+        run: ${{ matrix.command }}
 
   # ─────────────────────────── Stage 2: Build ────────────────────────────
   # Builds the actual deployable artifact (the Docker image) and runs an
