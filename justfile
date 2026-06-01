@@ -1,4 +1,5 @@
 image := "convert-to-hex:dev"
+release_image := "ghcr.io/llacoste/convert-to-hex:latest"
 
 default: build
 
@@ -6,10 +7,17 @@ default: build
 docker-build:
     docker build -t {{image}} .
 
-# Run the conversion. Usage: just convert <input> <output> [extra args...]
+# Run the locally-built image against the given args (rebuilds first).
+# Use this for dev-loop iteration when you have uncommitted changes.
 # Example: just convert images/face.png tmp/face.svg --tile-size 60
 convert *args: docker-build
     docker run --rm -v "$(pwd):/work" {{image}} {{args}}
+
+# Run the latest published release from GHCR. No local build, no source
+# checkout needed — this is "use the tool". Docker pulls on first use.
+# Example: just run images/face.png tmp/face.svg --tile-size 110
+run *args:
+    docker run --rm -v "$(pwd):/work" {{release_image}} {{args}}
 
 # Alias kept for consistency with other repos' default recipe.
 build: docker-build
