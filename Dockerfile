@@ -27,6 +27,12 @@ COPY priv ./priv
 COPY lib ./lib
 RUN mix compile
 
+# Test sources and formatter config aren't needed for the runtime CLI, but
+# carrying them lets `mix test` and `mix format --check-formatted` run
+# inside this same image in CI.
+COPY .formatter.exs ./
+COPY test ./test
+
 COPY bin/convert_to_hex /usr/local/bin/convert_to_hex
 RUN chmod +x /usr/local/bin/convert_to_hex
 

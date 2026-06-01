@@ -32,21 +32,23 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # The source + deps are baked into the image at /app, so mix commands
+      # for format/compile/test run there with no host mount.
       - name: Check formatting
         run: |
-          docker run --rm -v "${{ github.workspace }}:/work" \
+          docker run --rm --workdir /app \
             --entrypoint mix convert-to-hex:ci \
             format --check-formatted
 
       - name: Compile (warnings as errors)
         run: |
-          docker run --rm -v "${{ github.workspace }}:/work" \
+          docker run --rm --workdir /app \
             --entrypoint mix convert-to-hex:ci \
             compile --warnings-as-errors
 
       - name: Run tests
         run: |
-          docker run --rm -v "${{ github.workspace }}:/work" \
+          docker run --rm --workdir /app \
             --entrypoint mix convert-to-hex:ci \
             test --color
 
@@ -54,7 +56,7 @@ jobs:
         run: |
           mkdir -p tmp
           docker run --rm -v "${{ github.workspace }}:/work" convert-to-hex:ci \
-            legacy/images/face.png tmp/face.svg --tile-size 40
+            images/face.png tmp/face.svg --tile-size 40
           test -s tmp/face.svg
           head -1 tmp/face.svg | grep -q '<?xml'
 
